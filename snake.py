@@ -7,9 +7,6 @@ MOVEMENT_SPEED = 3
 
 class Snake:
     def __init__(self, position_x, position_y, change_x, change_y, width, heigth, color):
-
-        # Take the parameters of the init function above,
-        # and create instance variables out of them.
         self.position_x = position_x
         self.position_y = position_y
         self.change_x = change_x
@@ -27,7 +24,7 @@ class Snake:
                                      self.color)
 
     def update(self):
-        # Move snake
+        # Move the snake
         self.position_x += self.change_x
         self.position_y += self.change_y
 
@@ -47,11 +44,13 @@ class MyGame(arcade.Window):
     def on_draw(self):
         """ Called whenever need to draw """
         arcade.start_render()
+
+        # Draw snake
         self.snake.draw()
 
         # Draw food
         arcade.draw_circle_filled(300, 300, 5, arcade.color.RED)
-
+        
 
     def update(self, delta_time):
         self.snake.update()
@@ -60,12 +59,16 @@ class MyGame(arcade.Window):
         """ Called whenever the user presses a key. """
         if key == arcade.key.LEFT:
             self.snake.change_x = -MOVEMENT_SPEED
+            self.snake.change_y = 0
         if key == arcade.key.RIGHT:
             self.snake.change_x = MOVEMENT_SPEED
+            self.snake.change_y = 0
         if key == arcade.key.UP:
             self.snake.change_y = MOVEMENT_SPEED
+            self.snake.change_x = 0
         if key == arcade.key.DOWN:
             self.snake.change_y = -MOVEMENT_SPEED
+            self.snake.change_x = 0
 
 
 
