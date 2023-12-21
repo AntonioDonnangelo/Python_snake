@@ -3,7 +3,7 @@ import arcade
 
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
-MOVEMENT_SPEED = 3
+MOVEMENT_SPEED = 4
 
 
 class Snake:
@@ -15,20 +15,31 @@ class Snake:
         self.width = width
         self.height = height
         self.color = color
+        self.body = []
 
     def draw_snake(self):
-        """ Draw snake with the instance variables we have. """
-        arcade.draw_rectangle_filled(self.position_x, 
-                                     self.position_y,
-                                     self.width,
-                                     self.height,
-                                     self.color)
+        # Draw the head
+        arcade.draw_rectangle_filled(
+            self.position_x, self.position_y, self.width, self.height, self.color
+        )
+
+        # Draw the body
+        for segment in self.body:
+            arcade.draw_rectangle_filled(
+                segment[0], segment[1], self.width, self.height, self.color
+            )
 
     def update(self):
         # Move the snake
         self.position_x += self.change_x
         self.position_y += self.change_y
 
+        # Update body segments
+        self.body.insert(0, (self.position_x, self.position_y))
+
+        # If the snake is longer than 1, remove the last segment
+        if len(self.body) > 1:
+            self.body.pop()
 
 class Food:
     def __init__(self, position_x, position_y, change_x, change_y, radius, color):
@@ -96,14 +107,28 @@ class MyGame(arcade.Window):
             18,
         )
     def update(self, delta_time):
+        # If snake collides with food, update food position
         if (
                 self.snake.position_x - self.snake.width / 2 < self.food.position_x < self.snake.position_x + self.snake.width / 2
                 and self.snake.position_y - self.snake.height / 2 < self.food.position_y < self.snake.position_y + self.snake.height / 2
         ):
-            # If snake collides with food, update food position
-            self.food.position_x = randint(0, SCREEN_WIDTH)
-            self.food.position_y = randint(0, SCREEN_HEIGHT)
-            self.score += 1
+            self.food.position_x = randint(0, SCREEN_WIDTH-12)
+            self.food.position_y = randint(0, SCREEN_HEIGHT-12)
+            self.snake.body.append((0, 0))  # Add a new body segment
+            self.score += 1 # Add score
+
+        # Check if the snake's head has collided with the screen borders
+        if (
+                self.snake.position_x - self.snake.width / 2 < 0
+                or self.snake.position_x + self.snake.width / 2 > SCREEN_WIDTH
+                or self.snake.position_y - self.snake.height / 2 < 0
+                or self.snake.position_y + self.snake.height / 2 > SCREEN_HEIGHT
+        ):
+            # Handle collision with screen borders
+            self.snake.position_x = SCREEN_WIDTH / 2
+            self.snake.position_y = SCREEN_HEIGHT / 2
+            self.snake.body = []  # Reset the snake's body
+            self.score = 0
 
         self.snake.update()
         self.food.update()
@@ -123,6 +148,8 @@ class MyGame(arcade.Window):
         if key == arcade.key.DOWN:
             self.snake.change_y = -MOVEMENT_SPEED
             self.snake.change_x = 0
+        elif key == arcade.key.ESCAPE:
+            arcade.close_window()  # Close the game when the ESC key is pressed
 
 
 def main():
