@@ -75,7 +75,7 @@ class MyGame(arcade.Window):
                          0,
                          10,
                          arcade.color.RED)
-
+        self.score = 0
     def on_draw(self):
         """ Called whenever need to draw """
         arcade.start_render()
@@ -86,6 +86,15 @@ class MyGame(arcade.Window):
         # Draw food
         self.food.draw_food()
 
+        # Draw our score on the screen, scrolling it with the viewport
+        score_text = f"Score: {self.score}"
+        arcade.draw_text(
+            score_text,
+            10,
+            10,
+            arcade.csscolor.WHITE,
+            18,
+        )
     def update(self, delta_time):
         if (
                 self.snake.position_x - self.snake.width / 2 < self.food.position_x < self.snake.position_x + self.snake.width / 2
@@ -94,6 +103,7 @@ class MyGame(arcade.Window):
             # If snake collides with food, update food position
             self.food.position_x = randint(0, SCREEN_WIDTH)
             self.food.position_y = randint(0, SCREEN_HEIGHT)
+            self.score += 1
 
         self.snake.update()
         self.food.update()
